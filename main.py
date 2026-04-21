@@ -53,11 +53,12 @@ pd.read_sql("""SELECT * FROM sqlite_master""", conn)
 # %%
 # CodeGrade step1
 # Replace None with your code
-df_boston = pd.read_sql_query("""
-                              SELECT e.firstName, e.lastName, e.jobTitle 
-                                FROM employees e
-                                JOIN offices o ON e.officeCode = o.officeCode
-                                WHERE o.city = 'Boston'""", conn)
+df_boston = pd.read_sql("""
+    SELECT e.firstName, e.lastName, e.jobTitle
+    FROM employees e
+    JOIN offices o ON e.officeCode = o.officeCode
+    WHERE o.city = 'Boston'
+""", conn)
 
 # %% [markdown]
 # ### Step 2
@@ -229,6 +230,7 @@ df_under_20 = pd.read_sql("""
         GROUP BY od2.productCode
         HAVING COUNT(DISTINCT ord2.customerNumber) < 20
     )
+    ORDER BY e.employeeNumber
 """, conn)
 
 # %% [markdown]
