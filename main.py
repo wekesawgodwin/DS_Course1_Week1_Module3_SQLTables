@@ -216,22 +216,32 @@ df_customers = pd.read_sql("""
 # %%
 # CodeGrade step10
 # Replace None with your code
-df_under_20 = pd.read_sql("""
-    SELECT DISTINCT e.employeeNumber, e.firstName, e.lastName, o.city, o.officeCode
-    FROM employees e
-    JOIN offices o ON e.officeCode = o.officeCode
-    JOIN customers c ON e.employeeNumber = c.salesRepEmployeeNumber
-    JOIN orders ord ON c.customerNumber = ord.customerNumber
-    JOIN orderdetails od ON ord.orderNumber = od.orderNumber
-    WHERE od.productCode IN (
-        SELECT od2.productCode
-        FROM orderdetails od2
-        JOIN orders ord2 ON od2.orderNumber = ord2.orderNumber
-        GROUP BY od2.productCode
-        HAVING COUNT(DISTINCT ord2.customerNumber) < 20
-    )
-    ORDER BY e.employeeNumber
-""", conn)
+query_step10 = """
+SELECT DISTINCT 
+    e.employeeNumber, 
+    e.firstName, 
+    e.lastName, 
+    off.city, 
+    e.officeCode
+FROM employees e
+JOIN offices off 
+    ON e.officeCode = off.officeCode
+JOIN customers c 
+    ON e.employeeNumber = c.salesRepEmployeeNumber
+JOIN orders o 
+    ON c.customerNumber = o.customerNumber
+JOIN orderdetails od 
+    ON o.orderNumber = od.orderNumber
+WHERE od.productCode IN (
+    SELECT od2.productCode
+    FROM orderdetails od2
+    JOIN orders o2 ON od2.orderNumber = o2.orderNumber
+    GROUP BY od2.productCode
+    HAVING COUNT(DISTINCT o2.customerNumber) < 20
+)
+ORDER BY e.lastName;
+"""
+df_under_20 = pd.read_sql_query(query_step10, conn)
 
 # %% [markdown]
 # ### Close the connection
